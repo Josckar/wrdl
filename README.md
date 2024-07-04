@@ -6,6 +6,8 @@
 
 A personal clone of a class exercise in software development teamwork, subsystem communication, containers, deployment, and CI/CD pipelines. See [original project](https://github.com/software-students-spring2024/5-final-project-spring-2024-snailman-inc?tab=readme-ov-file) for the original iteration.
 
+This version migrates the html to an angular frontend, and makes a docker composition with the backend, database, and (TBA) frontend.
+
 ## About the Game
 
 **wrdl**: A deceptively difficult word game. 16 letters are given, from which the player must recreate 4 words of length 4. Add friends and compare the number of boards you've won.
