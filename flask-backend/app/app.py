@@ -1,6 +1,6 @@
 """ code related to the app goes here """
 
-from flask import Flask, render_template, redirect, request, url_for, flash
+from flask import Flask, jsonify, render_template, redirect, request, url_for, flash
 from flask_pymongo import PyMongo
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
@@ -77,10 +77,9 @@ def index():
     return render_template("index.html")
 
 
+
 # login page
-@app.route("/login")
-# login page
-@app.route("/login", methods=["GET", "POST"])  # Add methods=['GET', 'POST']
+@app.route("/login", methods=["GET", "POST"]) 
 def login():
     if request.method == "POST":
         # Process login form data
@@ -115,25 +114,24 @@ def profile():
 
 
 # account creation page
-@app.route("/signup", methods=["GET", "POST"])
+@app.route("/signup", methods=["POST"])
 def signup():  # pragma: no cover
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
-        if db.Users.find_one({"username": username}) != None:
-            return render_template("signup.html", username_taken=True)  # Username taken
-        else:
-            db.Users.insert_one(
-                {
-                    "username": username,
-                    "passHash": sha256(password.encode("utf-8")).hexdigest(),
-                    "currentPFP": "https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1095249842.jpg",
-                    "friends": [],
-                    "score": 0,
-                }
-            )
-            return redirect("/login")  # add user and send them to sign in
-    return render_template("signup.html", username_taken=False)
+    username = request.form.get("username")
+    password = request.form.get("password")
+    if db.Users.find_one({"username": username}) != None:
+        return render_template("signup.html", username_taken=True)
+    else:
+        db.Users.insert_one(
+            {
+                "username": username,
+                "passHash": sha256(password.encode("utf-8")).hexdigest(),
+                "currentPFP": "https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1095249842.jpg",
+                "friends": [],
+                "score": 0,
+            }
+        )
+    return jsonify({"message": "User created successfully"}), 201
+
 
 
 @app.route("/friends", methods=["GET", "POST"])
@@ -147,9 +145,7 @@ def friends():
         friend = db.Users.find_one({"username": friend_username})
         if friend:  # Check if friend exists
             friendData.append(friend_username + " (" + str(friend["score"]) + " wins)")
-    if request.method == "GET":
-        return render_template("friends.html", friendList=friendData)
-    else:
+    if request.method == "POST":
         target = request.form.get("target")
         if db.Users.find_one({"username": target}) != None:
             if target not in friends:
@@ -166,7 +162,8 @@ def friends():
                 friendData.append(
                     friend_username + " (" + str(friend["score"]) + " wins)"
                 )
-        return render_template("friends.html", friendList=friendData)
+
+    return jsonify( {"friendList": friendData })
 
 
 @app.route("/game")

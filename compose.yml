@@ -1,0 +1,57 @@
+services:
+
+  frontend:
+    build: ./flask-backend
+    image: wrdl-backend
+    ports:
+      - "5000:5000"
+    networks:
+      - front-tier
+      - back-tier
+    environment:
+      - MONGO_URI=mongodb://database:27017/ml-client-database
+      - MONGO_DB=ml-client-database
+    logging:
+      options:
+        tag: "Flask Backend App"
+
+
+  # ml-client:
+  #   build: ./machine-learning-client
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - mongodb-data:/etc/data
+  #   networks:
+  #     - back-tier
+  #   environment:
+  #     - MONGO_URI=mongodb://database:27017/ml-client-database
+  #     - MONGO_DB=ml-client-database
+  #   image: ml-client
+  #   logging:
+  #     options:
+  #       tag: "Machine Learning Client"
+
+  database:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - front-tier
+      - back-tier
+    environment:
+      - MONGO_URI="mongodb://database:27017/ml-client-database"
+    logging:
+      options:
+        tag: "Database"
+
+volumes:
+  mongodb-data:
+    driver: local
+
+networks:
+  # The presence of these objects is sufficient to define them
+  front-tier: {}
+  back-tier: {}
