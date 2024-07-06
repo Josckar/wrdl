@@ -22,7 +22,7 @@ docker compose up
 
 ### [Pytest](https://docs.pytest.org/en/stable/)
 
-In the project root: to run tests using pytest, build the dockerfile with:
+In [/flask-backend](./flask-backend): to run tests using pytest, build the dockerfile with:
 ```bash
 docker build -t test-image -f PytestDockerfile .
 ```
